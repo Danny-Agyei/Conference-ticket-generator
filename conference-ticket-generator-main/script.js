@@ -1,14 +1,14 @@
 "use strict";
 
 const containerApp = document.querySelector(".js-app-container");
+const containerAppHeader = document.querySelector(".js-app-header");
 const body = document.querySelector("body");
 const form = document.querySelector("form");
-const buttonForm = document.querySelector(".js-form-btn");
-const inputFileUpload = document.querySelector(".js-input-file");
-const appContainerHeader = document.querySelector(".js-app-header");
+const formSubmitButton = document.querySelector(".js-form-btn");
+const inputFile = document.querySelector(".js-input-file");
 const ticketContainer = document.querySelector(".js-ticket-container");
-const ticketIssueDate = document.querySelector(".js-ticket-date");
-const loaderAnimation = document.querySelector(".js-loader");
+const ticketDateElem = document.querySelector(".js-ticket-date");
+const loaderComponent = document.querySelector(".js-loader");
 
 // hints
 const hints = new Map([
@@ -34,40 +34,40 @@ const validateForm = () => {
   };
 
   // Show or hide hints
-  const toggleHint = function (show, input, inptName) {
-    const hintContainer = document.querySelector(`#${inptName}`);
+  const toggleHint = function (show, input, inputName) {
+    const hintContainer = document.querySelector(`#${inputName}`);
 
-    hintContainer.innerHTML = show ? hintElem(hints.get(inptName)) : "";
+    hintContainer.innerHTML = show ? hintElem(hints.get(inputName)) : "";
     hintContainer.classList.toggle("form__hint--error", show);
-    input.setAttribute("aria-describedby", show ? inptName : "");
+    input.setAttribute("aria-describedby", show ? inputName : "");
     input.classList.toggle("form__input--error", show);
   };
 
   const userData = {};
-  let passedValidation = false;
+  let passedValidation = true;
 
-  Array.from(inputFormfields, (input) => {
-    const inputName = input.getAttribute("name");
-    const inputValue = input.value;
+  Array.from(inputFormfields).forEach((input) => {
+    const { name: inputName, value: inputValue } = input;
+    const trimedValue = inputValue.trim();
 
-    if (!inputValue.trim()) {
+    if (trimedValue.length < 4) {
       toggleHint(true, input, inputName);
+      passedValidation = false;
     } else {
       toggleHint(false, input, inputName);
-
-      if (inputName === "email_address") {
-        if (
-          input.value.endsWith("@example.com") ||
-          input.validity.typeMismatch
-        ) {
-          toggleHint(true, input, inputName);
-          return;
-        }
-        passedValidation = true;
-      }
-
-      userData[inputName] = input.value;
     }
+
+    if (inputName === "email_address") {
+      const isInVlaidEmail =
+        !trimedValue ||
+        input.validity.typeMismatch ||
+        trimedValue.endsWith("@example.com");
+
+      toggleHint(isInVlaidEmail, input, inputName);
+      passedValidation = !isInVlaidEmail;
+    }
+
+    userData[inputName] = trimedValue;
   });
 
   // Store user details on successful validation
@@ -106,7 +106,7 @@ const generateTicket = () => {
         <h3 class="ticket__name">${data.fullname}</h3>
         <div class="ticket__github">
           <img src="./assets/images/icon-github.svg" alt="" class="ticket__icon">
-          <span>${data[github_name]}</span>
+          <span>${data["github_name"]}</span>
         </div>
       </div>
     </div>
@@ -114,24 +114,30 @@ const generateTicket = () => {
   `;
 
   // add disable effect on submit button
-  buttonForm.textContent = "Please wait...";
-  buttonForm.classList.add("form__btn--disable");
+  formSubmitButton.textContent = "Please wait...";
+  formSubmitButton.classList.add("form__btn--disable");
 
   // show loader
-  loaderAnimation.classList.add("app__loader--show");
+  loaderComponent.classList.add("app__loader--show");
 
   // disable scrolling while preparing ticket
   body.style.overflow = "hidden";
 
-  //Update page
+  //Update page UI
   setTimeout(() => {
-    appContainerHeader.innerHTML = appHeaderContent;
-    ticketContainer.insertAdjacentHTML("beforeend", appHeaderContent);
-    ticketIssueDate.textContent = `${month} ${day}, ${year}`;
+    containerAppHeader.innerHTML = appHeaderContent;
+    ticketContainer.insertAdjacentHTML("beforeend", ticketContent);
+    ticketDateElem.textContent = `${month} ${day}, ${year}`;
 
     body.style.height = "100vh";
     form.style.display = "none";
-  }, 500);
+
+    // remove loader
+    loaderComponent.classList.remove("app__loader--show");
+
+    // show ticket
+    document.querySelector(".js-ticket-main").style.display = "block";
+  }, 1000);
 };
 
 // Form submit Handler
