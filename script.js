@@ -4,16 +4,21 @@ const containerApp = document.querySelector(".js-app-container");
 const containerAppHeader = document.querySelector(".js-app-header");
 const body = document.querySelector("body");
 const form = document.querySelector("form");
-const formSubmitButton = document.querySelector(".js-form-btn");
+const fileInput = document.querySelector(".js-input-file");
+const submitButton = document.querySelector(".js-form-btn");
 const uploadArea = document.querySelector(".js-upload-area");
 const previewContaier = document.querySelector(".js-preview-container");
 const ticketContainer = document.querySelector(".js-ticket-container");
-const ticketDateElem = document.querySelector(".js-ticket-date");
+const ticketDate = document.querySelector(".js-ticket-date");
 const loaderComponent = document.querySelector(".js-loader");
 
 // hints
 const hints = new Map([
-  ["avatar", "File too large. Please upload a photo under 500KB.", ,],
+  [
+    "avatar",
+    "File invalid or too large. Please upload a photo under 500KB.",
+    ,
+  ],
   ["fullname", "Please enter your full name."],
   ["email_address", "Please enter a valid email address."],
   ["github_name", "Please enter your github username."],
@@ -30,6 +35,8 @@ const createHintElement = (text) => {
   ${text}`;
 };
 
+const userData = {};
+
 // Show or hide hints
 const toggleHint = function (show, input, inputName) {
   const hintContainer = document.querySelector(`#${inputName}`);
@@ -38,7 +45,7 @@ const toggleHint = function (show, input, inputName) {
   input.setAttribute("aria-describedby", show ? inputName : "");
   input.classList.toggle("form__input--error", show);
 
-  if (!show && inputName === "avatar") {
+  if (inputName === "avatar") {
     hintContainer.innerHTML = createHintElement(
       "Upload your photo (JPG or PNG, max size: 500KB)."
     );
@@ -47,8 +54,6 @@ const toggleHint = function (show, input, inputName) {
 
   hintContainer.innerHTML = show ? createHintElement(hints.get(inputName)) : "";
 };
-
-const userData = {};
 
 // Form validation
 const validateForm = () => {
@@ -80,6 +85,16 @@ const validateForm = () => {
     userData[inputName] = trimedValue;
   });
 
+  //Check if they have not uploaded a file
+  if (!userData.imageUrl) {
+    passedValidation = false;
+    toggleHint(true, fileInput, fileInput.name);
+  }
+
+  if (!userData["github_name"].startsWith("@")) {
+    userData["github_name"] = `@${userData["github_name"]}`;
+  }
+
   // Store user details on successful validation
   passedValidation &&
     localStorage.setItem("form-data", JSON.stringify(userData));
@@ -108,7 +123,7 @@ const generateTicket = () => {
 
   const ticketContent = `
     <div class="ticket__footer">
-      <img src="./assets/images/image-avatar.jpg" alt="" class="ticket__avatar">
+      <img src="${data.imageUrl}" alt="" class="ticket__avatar">
       <div class="ticket__user">
         <h3 class="ticket__name">${data.fullname}</h3>
         <div class="ticket__github">
@@ -121,8 +136,8 @@ const generateTicket = () => {
   `;
 
   // add disable effect on submit button
-  formSubmitButton.textContent = "Please wait...";
-  formSubmitButton.classList.add("form__btn--disable");
+  submitButton.textContent = "Please wait...";
+  submitButton.classList.add("form__btn--disable");
 
   // show loader
   loaderComponent.classList.add("app__loader--show");
@@ -134,7 +149,7 @@ const generateTicket = () => {
   setTimeout(() => {
     containerAppHeader.innerHTML = appHeaderContent;
     ticketContainer.insertAdjacentHTML("beforeend", ticketContent);
-    ticketDateElem.textContent = `${month} ${day}, ${year}`;
+    ticketDate.textContent = `${month} ${day}, ${year}`;
 
     body.style.height = "100vh";
     form.style.display = "none";
@@ -147,21 +162,21 @@ const generateTicket = () => {
   }, 1000);
 };
 
-// User photo upload handler
+// File upload handler
 const uploadHandler = function (e) {
   const previewImage = document.querySelector(".js-preview-image");
   const fileTypes = ["image/jpeg", "image/png"];
-  const target = e.target;
+  const input = e.target;
 
-  if (target.files.length < 1) return;
+  if (input.files.length < 1) return;
 
   const {
     name: inputName,
     files: [{ size, type }],
-  } = target;
+  } = input;
 
   if (!fileTypes.includes(type) || (size / 1e3).toFixed(1) > 500) {
-    toggleHint(true, target, inputName);
+    toggleHint(true, input, inputName);
     return;
   }
 
@@ -170,9 +185,10 @@ const uploadHandler = function (e) {
     previewImage.remove();
   }
 
-  const imageUrl = URL.createObjectURL(target.files[0]);
+  //Create image url for preview
+  const imageUrl = URL.createObjectURL(input.files[0]);
 
-  toggleHint(false, target, inputName);
+  toggleHint(false, input, inputName);
   userData["imageUrl"] = imageUrl;
   showPreview(imageUrl);
 };
@@ -193,7 +209,6 @@ const showPreview = (imageUrl) => {
 // Preview Reset handler
 const removeImage = () => {
   const previewImage = document.querySelector(".js-preview-image");
-  const inputFile = document.querySelector(".js-input-file");
 
   if (!userData.imageUrl && !previewImage) return;
   URL.revokeObjectURL(userData.imageUrl);
@@ -204,7 +219,7 @@ const removeImage = () => {
   previewImage.remove();
 
   // clear input
-  inputFile.value = "";
+  fileInput.value = "";
 };
 
 // Form submit Handler
@@ -214,7 +229,7 @@ const onSubmitHandler = (e) => {
 };
 
 // App Events
-document.addEventListener("change", (e) => uploadHandler(e));
+fileInput.addEventListener("change", (e) => uploadHandler(e));
 document.addEventListener("submit", (e) => onSubmitHandler(e));
 document
   .querySelector(".js-remove-preview-btn")

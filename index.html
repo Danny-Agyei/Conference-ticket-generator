@@ -33,13 +33,13 @@
     <a href="#">
       <img src="./assets/images/logo-full.svg" role="img" width="180" height="180" alt="Coding Conf Home"
         class="header__logo" /></a>
-    <img src="./assets/images/pattern-squiggly-line-top.svg" alt="" width="100" height="100" class="header__pattern" />
+    <img src="./assets/images/pattern-squiggly-line-top.svg" alt="" width="100" height="100" class="header__bg-image" />
   </header>
 
   <main class="app">
     <!-- Background pattern  -->
     <div class="app__pattern">
-      <img class="app__bg-lines" src="./assets/images/pattern-lines.svg" alt="" width="200" height="200" />
+      <img class="app__bg-image" src="./assets/images/pattern-lines.svg" alt="" width="200" height="200" />
     </div>
     <div class="app__loader js-loader">
       <div class="app__animation">
@@ -122,11 +122,11 @@
         <img src="./assets/images/pattern-ticket.svg" alt="" class="ticket__bg">
         <div class="ticket__container js-ticket-container">
           <div class="ticket__header">
-            <div class="ticket__logo-wrapper">
               <img src="./assets/images/logo-mark.svg" alt="" class="ticket__logo">
-              <h2>Coding Conf</h2>
+              <div>
+                <h2>Coding Conf</h2>
+                <p class="ticket__date"><span class="js-ticket-date"></span> / Lapaz, Accra</p>
             </div>
-            <p class="ticket__date"><span class="js-ticket-date"></span> / Lapaz, Accra</p>
           </div>
         </div>
       </div>
@@ -139,8 +139,8 @@
             ./assets/images/pattern-squiggly-line-bottom-mobile-tablet.svg
           " media="(max-width: 767px)" />
       <source srcset="./assets/images/pattern-squiggly-line-bottom-desktop.svg" media="(min-width: 768px)" />
-      <img src="./assets/images/pattern-squiggly-line-bottom-mobile-tablet.svg" alt="" class="footer__lines" width="200"
-        height="200" />
+      <img src="./assets/images/pattern-squiggly-line-bottom-mobile-tablet.svg" alt="" class="footer__bg-image"
+        width="200" height="200" />
     </picture>
   </footer>
   <!-- Generated tickets starts
