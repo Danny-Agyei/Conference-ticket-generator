@@ -5,45 +5,55 @@ const containerAppHeader = document.querySelector(".js-app-header");
 const body = document.querySelector("body");
 const form = document.querySelector("form");
 const formSubmitButton = document.querySelector(".js-form-btn");
-const inputFile = document.querySelector(".js-input-file");
+const uploadArea = document.querySelector(".js-upload-area");
+const previewContaier = document.querySelector(".js-preview-container");
 const ticketContainer = document.querySelector(".js-ticket-container");
 const ticketDateElem = document.querySelector(".js-ticket-date");
 const loaderComponent = document.querySelector(".js-loader");
 
 // hints
 const hints = new Map([
-  ["file", ["File too large. Please upload a photo under 500KB."]],
+  ["avatar", "File too large. Please upload a photo under 500KB.", ,],
   ["fullname", "Please enter your full name."],
   ["email_address", "Please enter a valid email address."],
   ["github_name", "Please enter your github username."],
 ]);
 
+const createHintElement = (text) => {
+  return ` <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
+  <path stroke="#D1D0D5" stroke-linecap="round" stroke-linejoin="round"
+  d="M2 8a6 6 0 1 0 12 0A6 6 0 0 0 2 8Z" />
+  <path fill="#D1D0D5" d="M8.004 10.462V7.596ZM8 5.57v-.042Z" />
+  <path stroke="#D1D0D5" stroke-linecap="round" stroke-linejoin="round"
+  d="M8.004 10.462V7.596M8 5.569v-.042" />
+  </svg>
+  ${text}`;
+};
+
+// Show or hide hints
+const toggleHint = function (show, input, inputName) {
+  const hintContainer = document.querySelector(`#${inputName}`);
+
+  hintContainer.classList.toggle("form__hint--error", show);
+  input.setAttribute("aria-describedby", show ? inputName : "");
+  input.classList.toggle("form__input--error", show);
+
+  if (!show && inputName === "avatar") {
+    hintContainer.innerHTML = createHintElement(
+      "Upload your photo (JPG or PNG, max size: 500KB)."
+    );
+    return;
+  }
+
+  hintContainer.innerHTML = show ? createHintElement(hints.get(inputName)) : "";
+};
+
+const userData = {};
+
 // Form validation
 const validateForm = () => {
   const inputFormfields = document.querySelectorAll(".js-input-field");
 
-  const hintElem = (text) => {
-    return ` <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
-    <path stroke="#D1D0D5" stroke-linecap="round" stroke-linejoin="round"
-    d="M2 8a6 6 0 1 0 12 0A6 6 0 0 0 2 8Z" />
-    <path fill="#D1D0D5" d="M8.004 10.462V7.596ZM8 5.57v-.042Z" />
-    <path stroke="#D1D0D5" stroke-linecap="round" stroke-linejoin="round"
-    d="M8.004 10.462V7.596M8 5.569v-.042" />
-    </svg>
-    ${text}`;
-  };
-
-  // Show or hide hints
-  const toggleHint = function (show, input, inputName) {
-    const hintContainer = document.querySelector(`#${inputName}`);
-
-    hintContainer.innerHTML = show ? hintElem(hints.get(inputName)) : "";
-    hintContainer.classList.toggle("form__hint--error", show);
-    input.setAttribute("aria-describedby", show ? inputName : "");
-    input.classList.toggle("form__input--error", show);
-  };
-
-  const userData = {};
   let passedValidation = true;
 
   Array.from(inputFormfields).forEach((input) => {
@@ -76,9 +86,6 @@ const validateForm = () => {
 
   return passedValidation;
 };
-
-// User photo upload handler
-const fileUploadHandler = () => {};
 
 // Ticket Componet Rendering Handler
 const generateTicket = () => {
@@ -140,9 +147,75 @@ const generateTicket = () => {
   }, 1000);
 };
 
-// Form submit Handler
-document.addEventListener("submit", (event) => {
-  event.preventDefault();
+// User photo upload handler
+const uploadHandler = function (e) {
+  const previewImage = document.querySelector(".js-preview-image");
+  const fileTypes = ["image/jpeg", "image/png"];
+  const target = e.target;
 
+  if (target.files.length < 1) return;
+
+  const {
+    name: inputName,
+    files: [{ size, type }],
+  } = target;
+
+  if (!fileTypes.includes(type) || (size / 1e3).toFixed(1) > 500) {
+    toggleHint(true, target, inputName);
+    return;
+  }
+
+  //remove the old preview if it's 'change image'
+  if (userData.imageUrl && previewImage) {
+    previewImage.remove();
+  }
+
+  const imageUrl = URL.createObjectURL(target.files[0]);
+
+  toggleHint(false, target, inputName);
+  userData["imageUrl"] = imageUrl;
+  showPreview(imageUrl);
+};
+
+// Preview handler
+const showPreview = (imageUrl) => {
+  if (!imageUrl) return;
+
+  const image = document.createElement("img");
+  image.classList.add("preview__image", "js-preview-image");
+  image.src = imageUrl;
+
+  previewContaier.insertAdjacentElement("afterbegin", image);
+  previewContaier.classList.add("preview--show");
+  uploadArea.classList.add("form__upload-area--hidden");
+};
+
+// Preview Reset handler
+const removeImage = () => {
+  const previewImage = document.querySelector(".js-preview-image");
+  const inputFile = document.querySelector(".js-input-file");
+
+  if (!userData.imageUrl && !previewImage) return;
+  URL.revokeObjectURL(userData.imageUrl);
+  delete userData.imageUrl;
+
+  previewContaier.classList.remove("preview--show");
+  uploadArea.classList.remove("form__upload-area--hidden");
+  previewImage.remove();
+
+  // clear input
+  inputFile.value = "";
+};
+
+// Form submit Handler
+const onSubmitHandler = (e) => {
+  e.preventDefault();
   validateForm() && generateTicket();
-});
+};
+
+// App Events
+document.addEventListener("change", (e) => uploadHandler(e));
+document.addEventListener("submit", (e) => onSubmitHandler(e));
+document
+  .querySelector(".js-remove-preview-btn")
+  .addEventListener("click", removeImage);

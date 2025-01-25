@@ -60,7 +60,6 @@ body {
   background-position: 100% 80%;
   color: var(--color-neutral-100);
   font-size: var(--fs-body);
-  /* height: 100vh; */
   line-height: 1.5;
   position: relative;
 }
@@ -106,6 +105,10 @@ input:focus,
 button:focus {
   outline: 2px solid var(--color-neutral-500);
   outline-offset: 3px;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+  visibility: hidden;
 }
 
 button {
@@ -198,7 +201,7 @@ button {
 .app__description {
   color: var(--color-neutral-300);
   font-size: 1.8rem;
-  max-width: 30rem;
+  max-width: 32rem;
   margin: var(--space-x3) auto;
 }
 
@@ -218,30 +221,15 @@ button {
   color: var(--color-orange-500)
 }
 
-.app__lines {
+.app__bg-lines {
   position: fixed;
   z-index: -1;
-}
-
-.app__lines--center {
   height: 760px;
   left: 0;
   object-fit: cover;
   right: 0;
   top: 0;
   width: 100%;
-}
-
-.app__lines--squiggly {
-  bottom: -5rem;
-  left: 0;
-  width: 10rem;
-}
-
-.app__lines--top {
-  right: 0;
-  top: 2rem;
-  width: 12rem;
 }
 
 /* Form Section  */
@@ -254,6 +242,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: var(--space-x2);
+  position: relative;
 }
 
 .form__group:not(:last-child) {
@@ -298,9 +287,10 @@ button {
 
 .form__input--file {
   border: none;
-  position: absolute;
+  color: transparent;
   height: inherit;
   left: 0;
+  position: absolute;
   top: 0;
   z-index: -1;
 }
@@ -310,13 +300,12 @@ button {
 }
 
 .form__hint {
-  stroke: #fff;
   align-items: center;
-  display: flex;
   color: var(--color-neutral-300);
+  display: none;
   font-size: var(--fs-label-sm);
   gap: var(--space-x1);
-  display: none;
+  stroke: #fff;
 }
 
 .form__hint--file {
@@ -324,9 +313,9 @@ button {
 }
 
 .form__hint--error {
-  stroke: var(--color-orange-700);
   color: var(--color-orange-700);
   display: flex;
+  stroke: var(--color-orange-700);
 }
 
 .form__btn {
@@ -363,23 +352,25 @@ button {
   display: flex;
   font-size: var(--fs-body);
   flex-direction: column;
-  height: 12rem;
+  height: 13rem;
   justify-content: center;
   margin-block-start: var(--space-x2);
   position: relative;
 }
 
 .form__file-wrapper:hover {
-  background: linear-gradient(90deg, rgba(69, 62, 114, 0.833) 100%, rgba(102, 95, 148, 0.712) 66%, rgba(130, 122, 182, 0.564) 100%);
+  background: linear-gradient(90deg, rgb(74 67 110 / 55%) 100%, rgb(102 95 148 / 88%) 66%, rgb(130 122 182 / 56%) 100%);
 }
 
-.form__upload,
-.form__blob,
-.form__action {
+.form__upload-area {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+}
+
+.form__upload-area--hidden {
+  display: none;
 }
 
 .form__file-title {
@@ -396,37 +387,57 @@ button {
   width: 5rem;
 }
 
-.form__blob {
-  width: 100%;
+.preview {
+  bottom: 0;
+  display: none;
   height: inherit;
-  pointer-events: none;
+  left: 0;
+  margin-block-start: var(--space-x2);
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 100%;
 }
 
-.form__image {
-  width: 100%;
-  max-width: 5rem;
+.preview--show {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.preview__image {
+  width: 6rem;
+  height: 6rem;
+  object-fit: cover;
   border: 1px solid var(--color-neutral-300);
   border-radius: 1rem;
   margin-block-end: var(--space-x3);
   pointer-events: none;
 }
 
-.form__action {
+.preview__controls {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   flex-direction: row;
   gap: var(--space-x4);
 }
 
-.form__action-btn {
+.preview__btn {
   background-color: var(--color-neutral-700);
   border: none;
   border-radius: 0.5rem;
   color: var(--color-neutral-300);
-  padding: var(--space-x2) var(--space-x2);
+  cursor: pointer;
   font-size: var(--fs-label-sm);
+  line-height: normal;
   outline: none;
+  padding: var(--space-x2) var(--space-x2);
 }
 
-.form__action-btn--remove {
+.preview__btn--remove {
   text-decoration: underline;
   text-decoration-thickness: 1.5px;
   text-underline-offset: 2.5px;
@@ -458,8 +469,8 @@ button {
 
 .ticket__logo-wrapper {
   display: flex;
-  gap: var(--space-x4);
   font-size: 2.35rem;
+  gap: var(--space-x4);
 }
 
 .ticket__logo {
@@ -482,8 +493,8 @@ button {
 
 .ticket__avatar {
   border-radius: 1rem;
-  width: 5rem;
   height: 5rem;
+  width: 5rem;
 }
 
 .ticket__github {
