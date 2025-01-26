@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <!-- displays site properly based on user's device -->
 
-  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png" />
+  <link rel="icon" type="image/svg" sizes="32x32" href="./assets/images/logo-mark.svg" />
   <title>Frontend Mentor | Conference ticket generator</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,17 +14,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400..800&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="./style.css" />
-  <!-- Feel free to remove these styles or customise in your own stylesheet 👍 -->
-  <style>
-    .attribution {
-      font-size: 11px;
-      text-align: center;
-    }
-
-    .attribution a {
-      color: hsl(228, 45%, 44%);
-    }
-  </style>
 </head>
 
 <body>
@@ -38,9 +27,9 @@
 
   <main class="app">
     <!-- Background pattern  -->
-    <div class="app__pattern">
-      <img class="app__bg-image" src="./assets/images/pattern-lines.svg" alt="" width="200" height="200" />
-    </div>
+      <img class="app__bg-lines" src="./assets/images/pattern-lines.svg" alt="" width="200" height="200" />
+
+    <!-- Loader  -->
     <div class="app__loader js-loader">
       <div class="app__animation">
         <dotlottie-player src="https://lottie.host/e3e4b351-4fc3-4d3f-a601-249cc60507e0/uaUtP3zzwZ.lottie"
@@ -48,6 +37,7 @@
         </dotlottie-player>
       </div>
     </div>
+
     <div class="app__container js-app-container">
       <div class="js-app-header">
         <h1 class="app__headline js-app-headline">
@@ -58,6 +48,7 @@
           Secure your spot at next year's biggest coding conference.
         </p>
       </div>
+
       <form novalidate class="form js-form">
         <div class="form__group">
           <label class="form__label" aria-labelledby="upload-label">
@@ -93,7 +84,7 @@
           <label for="fname" class="form__label">
             <span>Full Name</span>
           </label>
-          <input type="text" id="fname" name="fullname" class="form__input form__input--1 js-input-field"
+          <input type="text" id="fname" name="fullname" class="form__input form__input--1 js-form-input" autocomplete="off"
             aria-describedby="" />
           <p class="form__hint" id="fullname" aria-live="polite">
           </p>
@@ -102,7 +93,7 @@
           <label for="email" class="form__label">
             <span>Email Address</span>
           </label>
-          <input type="email" id="email" name="email_address" email class="form__input form__input--2 js-input-field"
+          <input type="email" id="email" name="email_address" email class="form__input form__input--2 js-form-input" autocomplete="off"
             placeholder="example@email.com" aria-describedby="" />
           <p class="form__hint" id="email_address" aria-live="polite">
           </p>
@@ -111,13 +102,14 @@
           <label for="github" class="form__label">
             <span>Github Username</span>
           </label>
-          <input id="github" type="text" class="form__input form__input--3 js-input-field" name="github_name"
+          <input id="github" type="text" class="form__input form__input--3 js-form-input" autocomplete="off" name="github_name"
             placeholder="@yourusername" aria-describedby="" />
           <p id="github_name" class="form__hint" aria-live="polite">
           </p>
         </div>
         <button class="form__btn js-form-btn">Generate My Ticket</button>
       </form>
+
       <div class="ticket js-ticket-main">
         <img src="./assets/images/pattern-ticket.svg" alt="" class="ticket__bg">
         <div class="ticket__container js-ticket-container">
@@ -143,27 +135,14 @@
         width="200" height="200" />
     </picture>
   </footer>
-  <!-- Generated tickets starts
 
- We've emailed your ticket to
-  <!-- Email Address -->
-  <!-- We've emailed your ticket to dandesign96@gmail.com and will send updates in the run up to the event. 
-     
-    Coding Conf Jan 31, 2025 / Austin, TX 
-  -->
-
-  <!-- Generated tickets ends -->
-
-  <!-- <div class="attribution">
+  <div class="attribution">
     Challenge by
-    <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>.
-    Coded by <a href="#">Your Name Here</a>.
-  </div> -->
-
-
+    <a class="attribution__link" href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>.
+    Coded by <a class="attribution__link" href="https://x.com/DankCodeGenius">Daniel Agyei</a>.
+  </div>
 
   <script src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs" type="module"></script>
   <script type="text/javascript" src="./script.js"></script>
 </body>
-
 </html>

@@ -66,7 +66,7 @@ body {
 }
 
 a,
-a:is(:active, :hover) {
+a::active {
   color: inherit;
   font-size: inherit;
 }
@@ -100,6 +100,7 @@ input {
   display: block;
   outline: none;
   width: 100%;
+  appearance: none;
 }
 
 input:focus,
@@ -112,11 +113,33 @@ input[type="file"]::-webkit-file-upload-button {
   visibility: hidden;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  background-color: transparent !important;
+  box-shadow: 000 10px white inset !important;
+  -webkitbox-shadow: 000 10px white inset !important;
+}
+
 button {
   border: none;
   cursor: pointer;
   display: inline-flex;
   outline: none;
+}
+
+.attribution {
+  text-align: center;
+  bottom: var(--space-x6);
+  font-size: var(--fs-label-sm);
+  position: absolute;
+  right: 0;
+  left: 0;
+}
+
+.attribution__link {
+  color: var(--color-orange-700);
 }
 
 /* Header  */
@@ -147,6 +170,17 @@ button {
   justify-content: center;
   padding: 0 var(--space-x4) 10rem;
   text-align: center;
+}
+
+.app__bg-lines {
+  position: fixed;
+  z-index: -1;
+  height: 760px;
+  left: 0;
+  object-fit: cover;
+  right: 0;
+  top: 0;
+  width: 100%;
 }
 
 .app__loader {
@@ -221,16 +255,6 @@ button {
   color: var(--color-orange-500);
 }
 
-.app__bg-image {
-  position: fixed;
-  z-index: -1;
-  height: 760px;
-  left: 0;
-  object-fit: cover;
-  right: 0;
-  top: 0;
-  width: 100%;
-}
 
 /* Form  */
 .form {
@@ -532,9 +556,8 @@ button {
   font-weight: var(--fw-600);
   height: max-content;
   line-height: 0;
-  padding-block-start: 0;
   position: absolute;
-  right: 0;
+  right: -1rem;
   top: 50%;
   transform: rotate(90deg);
 }
@@ -542,8 +565,8 @@ button {
 /* Footer  */
 .footer {
   bottom: 0rem;
-  position: absolute;
   left: 0rem;
+  position: absolute;
   z-index: -1;
 }
 
@@ -618,6 +641,10 @@ button {
   .ticket__avatar {
     height: 6rem;
     width: 6rem;
+  }
+
+  .ticket__number {
+    right: 0;
   }
 }
 

@@ -7,7 +7,7 @@ const form = document.querySelector("form");
 const fileInput = document.querySelector(".js-input-file");
 const submitButton = document.querySelector(".js-form-btn");
 const uploadArea = document.querySelector(".js-upload-area");
-const previewContaier = document.querySelector(".js-preview-container");
+const previewContainer = document.querySelector(".js-preview-container");
 const ticketContainer = document.querySelector(".js-ticket-container");
 const ticketDate = document.querySelector(".js-ticket-date");
 const loaderComponent = document.querySelector(".js-loader");
@@ -37,8 +37,7 @@ const createHintElement = (text) => {
 
 const userData = {};
 
-// Show or hide hints
-const toggleHint = function (show, input, inputName) {
+function toggleHint(show, input, inputName) {
   const hintContainer = document.querySelector(`#${inputName}`);
 
   hintContainer.classList.toggle("form__hint--error", show);
@@ -53,33 +52,32 @@ const toggleHint = function (show, input, inputName) {
   }
 
   hintContainer.innerHTML = show ? createHintElement(hints.get(inputName)) : "";
-};
+}
 
-// Form validation
-const validateForm = () => {
-  const inputFormfields = document.querySelectorAll(".js-input-field");
+function validateForm() {
+  const formInputs = document.querySelectorAll(".js-form-input");
 
-  let passedValidation = true;
+  let isValidationPassed = true;
 
-  Array.from(inputFormfields).forEach((input) => {
+  Array.from(formInputs).forEach((input) => {
     const { name: inputName, value: inputValue } = input;
     const trimedValue = inputValue.trim();
 
     if (trimedValue.length < 4) {
       toggleHint(true, input, inputName);
-      passedValidation = false;
+      isValidationPassed = false;
     } else {
       toggleHint(false, input, inputName);
     }
 
     if (inputName === "email_address") {
-      const isInVlaidEmail =
+      const isInValidEmail =
         !trimedValue ||
         input.validity.typeMismatch ||
         trimedValue.endsWith("@example.com");
 
-      toggleHint(isInVlaidEmail, input, inputName);
-      passedValidation = !isInVlaidEmail;
+      toggleHint(isInValidEmail, input, inputName);
+      isValidationPassed = !isInValidEmail;
     }
 
     userData[inputName] = trimedValue;
@@ -87,7 +85,7 @@ const validateForm = () => {
 
   //Check if they have not uploaded a file
   if (!userData.imageUrl) {
-    passedValidation = false;
+    isValidationPassed = false;
     toggleHint(true, fileInput, fileInput.name);
   }
 
@@ -96,23 +94,22 @@ const validateForm = () => {
   }
 
   // Store user details on successful validation
-  passedValidation &&
+  isValidationPassed &&
     localStorage.setItem("form-data", JSON.stringify(userData));
 
-  return passedValidation;
-};
+  return isValidationPassed;
+}
 
-// Ticket Componet Rendering Handler
+// Ticket Rendering Handler
 const generateTicket = () => {
   if (!localStorage.getItem("form-data")) return;
 
   const [_, month, day, year] = new Date().toString().split(" ");
   const ticketNumber = Math.floor(Math.random(2) * (919589 - 119589) + 119589);
 
-  // get form data from local storage
   const data = JSON.parse(localStorage.getItem("form-data"));
 
-  const appHeaderContent = `
+  const headerContent = `
     <h1 class="app__headline app__headline--ticket js-app-headline">
       Congrats, <span class="app__name js-app-name">${data.fullname}!</span> Your ticket is ready.
     <p class="app__description app__description--ticket js-app-description">
@@ -121,7 +118,7 @@ const generateTicket = () => {
     </p>
   `;
 
-  const ticketContent = `
+  const ticketCard = `
     <div class="ticket__footer">
       <img src="${data.imageUrl}" alt="" class="ticket__avatar">
       <div class="ticket__user">
@@ -135,36 +132,30 @@ const generateTicket = () => {
     <p class="ticket__number">#${ticketNumber}</p>
   `;
 
-  // add disable effect on submit button
   submitButton.textContent = "Please wait...";
   submitButton.classList.add("form__btn--disable");
 
-  // show loader
-  loaderComponent.classList.add("app__loader--show");
+  loaderComponent.classList.add("app__loader--show"); // show loader
 
-  // disable scrolling while preparing ticket
-  body.style.overflow = "hidden";
+  body.style.overflow = "hidden"; // disable scrolling while preparing ticket
 
   //Update page UI
   setTimeout(() => {
-    containerAppHeader.innerHTML = appHeaderContent;
-    ticketContainer.insertAdjacentHTML("beforeend", ticketContent);
+    containerAppHeader.innerHTML = headerContent;
+    ticketContainer.insertAdjacentHTML("beforeend", ticketCard);
     ticketDate.textContent = `${month} ${day}, ${year}`;
 
     body.style.height = "100vh";
     form.style.display = "none";
 
-    // remove loader
-    loaderComponent.classList.remove("app__loader--show");
+    loaderComponent.classList.remove("app__loader--show"); // remove loader
 
-    // show ticket
-    document.querySelector(".js-ticket-main").style.display = "block";
+    document.querySelector(".js-ticket-main").style.display = "block"; // display ticket
   }, 1000);
 };
 
-// File upload handler
-const uploadHandler = function (e) {
-  const previewImage = document.querySelector(".js-preview-image");
+function uploadImage(e) {
+  const avatar = document.querySelector(".js-preview-image");
   const fileTypes = ["image/jpeg", "image/png"];
   const input = e.target;
 
@@ -175,62 +166,58 @@ const uploadHandler = function (e) {
     files: [{ size, type }],
   } = input;
 
+  // throw error when file size is above 500kb
   if (!fileTypes.includes(type) || (size / 1e3).toFixed(1) > 500) {
     toggleHint(true, input, inputName);
     return;
   }
 
-  //remove the old preview if it's 'change image'
-  if (userData.imageUrl && previewImage) {
-    previewImage.remove();
+  //remove the old preview if it's 'change image event'
+  if (userData.imageUrl && avatar) {
+    avatar.remove();
   }
 
-  //Create image url for preview
-  const imageUrl = URL.createObjectURL(input.files[0]);
+  const imageUrl = URL.createObjectURL(input.files[0]); //create preview image url
 
   toggleHint(false, input, inputName);
   userData["imageUrl"] = imageUrl;
-  showPreview(imageUrl);
-};
+  previewUploadedImage(imageUrl);
+}
 
-// Preview handler
-const showPreview = (imageUrl) => {
+function previewUploadedImage(imageUrl) {
   if (!imageUrl) return;
 
   const image = document.createElement("img");
   image.classList.add("preview__image", "js-preview-image");
   image.src = imageUrl;
 
-  previewContaier.insertAdjacentElement("afterbegin", image);
-  previewContaier.classList.add("preview--show");
+  previewContainer.insertAdjacentElement("afterbegin", image);
+  previewContainer.classList.add("preview--show");
   uploadArea.classList.add("form__upload-area--hidden");
-};
+}
 
-// Preview Reset handler
-const removeImage = () => {
-  const previewImage = document.querySelector(".js-preview-image");
+function removeUploadedImage() {
+  const avatar = document.querySelector(".js-preview-image");
 
-  if (!userData.imageUrl && !previewImage) return;
+  if (!userData.imageUrl && !avatar) return;
   URL.revokeObjectURL(userData.imageUrl);
   delete userData.imageUrl;
 
-  previewContaier.classList.remove("preview--show");
+  previewContainer.classList.remove("preview--show");
   uploadArea.classList.remove("form__upload-area--hidden");
-  previewImage.remove();
+  avatar.remove();
 
-  // clear input
   fileInput.value = "";
-};
+}
 
-// Form submit Handler
 const onSubmitHandler = (e) => {
   e.preventDefault();
   validateForm() && generateTicket();
 };
 
 // App Events
-fileInput.addEventListener("change", (e) => uploadHandler(e));
+fileInput.addEventListener("change", (e) => uploadImage(e));
 document.addEventListener("submit", (e) => onSubmitHandler(e));
 document
   .querySelector(".js-remove-preview-btn")
-  .addEventListener("click", removeImage);
+  .addEventListener("click", removeUploadedImage);
