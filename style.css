@@ -580,6 +580,10 @@ button {
 
 /* Screen higher than 575px  */
 @media only screen and (min-width: 35.9375em) {
+  :root {
+    --fs-h1: 3.3rem;
+  }
+
   body {
     background-position: 100% 80%;
   }
@@ -651,7 +655,7 @@ button {
 /* Screen above 992px */
 @media only screen and (min-width: 62em) {
   :root {
-    --fs-h1: 4.6rem;
+    --fs-h1: 5rem;
   }
 
   body {
